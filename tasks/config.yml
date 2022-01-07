@@ -145,11 +145,14 @@
     - airflow-extra-vars-file
 
 - name: Airflow | Add connections from configuration file
-  command: "{{ airflow_executable }} connections -a \
-  {% for key, value in item.iteritems() %}--{{ key }} '{{ value }}' \
-  {% endfor %}"
   become: true
   become_user: "{{ airflow_user }}"
+  environment:
+    AIRFLOW_HOME: "{{ airflow_app_home }}"
+    AIRFLOW_CONFIG: /etc/airflow/airflow.cfg
+  command: "{{ airflow_executable }} connections add \
+  {% for key, value in item['properties'].items() %}--{{ key }} '{{ value }}' \
+  {% endfor %} {{ item['name'] }}"
   with_items: "{{ airflow_admin_connections }}"
   tags:
     - skip_ansible_lint
