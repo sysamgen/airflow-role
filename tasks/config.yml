@@ -154,6 +154,7 @@
   {% for key, value in item['properties'].items() %}--{{ key }} '{{ value }}' \
   {% endfor %} {{ item['name'] }}"
   with_items: "{{ airflow_admin_connections }}"
+  ignore_errors: true
   tags:
     - skip_ansible_lint
     - airflow-extra-conn-file
