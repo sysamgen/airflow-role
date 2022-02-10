@@ -136,9 +136,12 @@
   tags: airflow-extra-config
 
 - name: Airflow | Add variables from configuration file
-  command: "{{ airflow_executable }} variables -s {{ item.key }} {{ item.value }}"
+  command: "{{ airflow_executable }} variables set {{ item.key }} {{ item.value }}"
   become: true
   become_user: "{{ airflow_user }}"
+  environment:
+    AIRFLOW_HOME: "{{ airflow_app_home }}"
+    AIRFLOW_CONFIG: "{{ airflow_conf_path }}/airflow.cfg"
   with_items: "{{ airflow_admin_variables }}"
   tags:
     - skip_ansible_lint
@@ -149,7 +152,7 @@
   become_user: "{{ airflow_user }}"
   environment:
     AIRFLOW_HOME: "{{ airflow_app_home }}"
-    AIRFLOW_CONFIG: /etc/airflow/airflow.cfg
+    AIRFLOW_CONFIG: "{{ airflow_conf_path }}/airflow.cfg"
   command: "{{ airflow_executable }} connections add \
   {% for key, value in item['properties'].items() %}--{{ key }} '{{ value }}' \
   {% endfor %} {{ item['name'] }}"
